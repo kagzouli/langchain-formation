@@ -1,8 +1,21 @@
+from typing import List
+from pydantic import BaseModel, Field
+
 from dotenv import load_dotenv
 from langchain.agents import create_agent
 from langchain.tools import tool
 from langchain_core.messages import HumanMessage
 from langchain_ollama import ChatOllama
+
+
+class Source(BaseModel):
+    """Scheme by the source used by the agent """
+    url: str = Field(description="URL of the source")
+
+class AgentResponse(BaseModel):
+    """Scheme for the answer response"""
+    answer:str = Field(description="Agent answer for the query")
+    sources: List[Source] = Field(default_factory=list, description="list of sources to generate the answer")
 
 load_dotenv()
 
@@ -32,7 +45,7 @@ def searchData(query: str) -> str:
 llm = ChatOllama(temperature=0, model="llama3.2:3b")
 tools = [searchData]
 
-agent = create_agent(model=llm, tools=tools)
+agent = create_agent(model=llm, tools=tools, response_format=AgentResponse)
 def main():
     print("Hello from langchain-searchagent!")
 
