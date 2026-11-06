@@ -11,7 +11,7 @@ load_dotenv()
 
 from langchain.chat_models import init_chat_model
 
-MAX_ITERATIONS=6
+MAX_ITERATIONS=8
 MODEL = "qwen3:4b"
 
 @tool
@@ -90,6 +90,13 @@ def run_agent(question: str):
         observation = tool_use.invoke(tool_args)
         print(f" [Tool Result]: {observation}")
 
+        # Add tool result to conversation history
+        messages.append(
+            ToolMessage(
+                content=str(observation),
+                tool_call_id=tool_call["id"]
+            )
+        )
 
 if __name__ == '__main__':
     print("Hello Langchain Agent (.bind_tools)!")
